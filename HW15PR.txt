@@ -1,0 +1,5 @@
+unstoppable:
+forge test --mc Unstoppable -vvv
+
+naive-receiver:
+forge test --mc NaiveReceiver -vvv

